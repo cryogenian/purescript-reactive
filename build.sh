@@ -1,1 +1,1 @@
-psc reactive.purs test.purs -o test.js --main --module Main --tco --magic-do
+psc reactive.purs.hs test.purs.hs -o test.js --main --module Main --tco --magic-do
