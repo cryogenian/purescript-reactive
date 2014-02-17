@@ -241,6 +241,10 @@ instance Prelude.Applicative Computed where
     }
 
 
+-- Read a computed value
+readComputed :: forall a eff. Computed a -> Eff (reactive :: Reactive | eff) a
+readComputed (Computed c) = c.read
+
 -- Subscribe for updates on a computed value
 subscribeComputed :: forall a eff. Computed a -> (a -> Eff (reactive :: Reactive | eff) {}) -> Eff (reactive :: Reactive | eff) Subscription
 subscribeComputed (Computed c) f = c.subscribe f
