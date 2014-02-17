@@ -231,12 +231,12 @@ instance Prelude.Applicative Computed where
         x' <- x.read
         return $ f' x'
     , subscribe: \ob -> do
-        s1 <- f.subscribe (\f' -> do
+        s1 <- f.subscribe $ \f' -> do
           x' <- x.read
-          ob (f' x'))
-        s2 <- x.subscribe (\x' -> do
+          ob $ f' x'
+        s2 <- x.subscribe $ \x' -> do
           f' <- f.read
-          ob (f' x')) 
+          ob $ f' x'
         return $ s1 <> s2
     }
 
