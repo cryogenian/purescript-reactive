@@ -67,19 +67,19 @@ foreign import newRArray
   \        self.insert = function (value, index) {\
   \          self.values.splice(index, 0, value);\
   \          for (var i = 0; i < self.listeners.length; i++) {\
-  \            self.listeners[i](_ps.Reactive.Inserted(value)(index));\
+  \            self.listeners[i](module.Inserted(value)(index));\
   \          }\
   \        };\
   \        self.remove = function (index) {\
   \          self.values.splice(index, 1);\
   \          for (var i = 0; i < self.listeners.length; i++) {\
-  \            self.listeners[i](_ps.Reactive.Removed(index));\
+  \            self.listeners[i](module.Removed(index));\
   \          }\
   \        };\
   \        self.update = function (value, index) {\
   \          self.values[index] = index;\
   \          for (var i = 0; i < self.listeners.length; i++) {\
-  \            self.listeners[i](_ps.Reactive.Updated(value)(index));\
+  \            self.listeners[i](module.Updated(value)(index));\
   \          }\
   \        };\
   \      };\
