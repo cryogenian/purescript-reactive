@@ -1,8 +1,8 @@
 module Reactive where
 
 import Prelude
-import Eff
-import Monoid
+import Data.Monoid
+import Control.Monad.Eff
 
 -- Reactive variables
 foreign import data RVar :: * -> *
@@ -158,7 +158,7 @@ foreign import updateRArray
 -- Subscription which can be cancelled
 data Subscription = Subscription (Eff (reactive :: Reactive) {})
 
-instance Monoid.Monoid Subscription where
+instance Data.Monoid.Monoid Subscription where
   mempty = Subscription $ return {}
   (<>) (Subscription cancel1) (Subscription cancel2) = Subscription $ do
     cancel1
