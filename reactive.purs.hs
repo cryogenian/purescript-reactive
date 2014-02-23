@@ -1,8 +1,8 @@
 module Reactive where
 
 import Prelude
-import Data.Monoid
 import Control.Monad.Eff
+import Data.Monoid
 
 -- Reactive variables
 foreign import data RVar :: * -> *
@@ -156,13 +156,13 @@ foreign import updateRArray
   \}" :: forall a eff. RArray a -> a -> Number -> Eff (reactive :: Reactive | eff) {}
 
 -- Subscription which can be cancelled
-data Subscription = Subscription (Eff (reactive :: Reactive) {})
+data Subscription = Subscription (forall eff. Eff (reactive :: Reactive | eff) {})
 
 instance Data.Monoid.Monoid Subscription where
-  mempty = Subscription $ return {}
-  (<>) (Subscription cancel1) (Subscription cancel2) = Subscription $ do
+  mempty = Subscription (return {})
+  (<>) (Subscription cancel1) (Subscription cancel2) = Subscription (do
     cancel1
-    cancel2
+    cancel2)
 
 -- Subscribe for updates on an RVar 
 foreign import subscribe 
@@ -219,6 +219,31 @@ toComputed ref = Computed
   { read: readRVar ref
   , subscribe: subscribe ref
   }
+
+-- Convert an RArray to a computed array
+toComputedArray :: forall a. RArray a -> Computed [a]
+toComputedArray arr = Computed 
+  { read: readRArray arr
+  , subscribe: \f -> subscribeArray arr (\_ -> readRArray arr >>= f)
+  }
+
+foreign import extendComputed
+  "function extendComputed(extend) {\
+  \  return module.Computed({\
+  \    read: function() {\
+  \      return function(a) {\
+  \        return extend(a)();\
+  \      };\
+  \    },\
+  \    subscribe: function(k) {\
+  \      return function() {\
+  \        return module.Subscription(function() {\
+  \        });\
+  \      };\
+  \    }\
+  \  });\
+  \}" :: forall a b. (forall eff. a -> Eff (reactive :: Reactive | eff) b) -> Computed (a -> b)
+
 
 instance Prelude.Applicative Computed where
   pure a = Computed 
