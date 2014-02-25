@@ -3,6 +3,7 @@ module Reactive where
 import Prelude
 import Control.Monad.Eff
 import Data.Monoid
+import Data.IORef (newIORef, readIORef, writeIORef, unsafeRunIORef)
 
 -- Reactive variables
 foreign import data RVar :: * -> *
@@ -227,23 +228,29 @@ toComputedArray arr = Computed
   , subscribe: \f -> subscribeArray arr (\_ -> readRArray arr >>= f)
   }
 
-foreign import extendComputed
-  "function extendComputed(extend) {\
-  \  return module.Computed({\
-  \    read: function() {\
-  \      return function(a) {\
-  \        return extend(a)();\
-  \      };\
-  \    },\
-  \    subscribe: function(k) {\
-  \      return function() {\
-  \        return module.Subscription(function() {\
-  \        });\
-  \      };\
-  \    }\
-  \  });\
-  \}" :: forall a b. (forall eff. a -> Eff (reactive :: Reactive | eff) b) -> Computed (a -> b)
-
+instance Prelude.Monad Computed where
+  return = pure
+  (>>=) (Computed a) f = Computed 
+    { read: do
+        x <- a.read
+        let Computed y = f x
+        y.read
+    , subscribe: \ob -> do
+        initial <- a.read 
+        let Computed b = f initial
+        s <- b.subscribe ob
+        r <- unsafeRunIORef $ newIORef s
+        aSub <- a.subscribe $ \a' -> do
+          Subscription unsubscribe <- unsafeRunIORef $ readIORef r
+          unsubscribe
+          let Computed b' = f a'
+          b'.read >>= ob
+          s' <- b'.subscribe ob
+          unsafeRunIORef $ writeIORef r s'
+        return $ aSub <> Subscription (do
+          Subscription unsubscribe <- unsafeRunIORef $ readIORef r
+          unsubscribe)
+    }
 
 instance Prelude.Applicative Computed where
   pure a = Computed 
