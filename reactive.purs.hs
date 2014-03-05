@@ -159,7 +159,7 @@ foreign import updateRArray
 -- Subscription which can be cancelled
 data Subscription = Subscription (forall eff. Eff (reactive :: Reactive | eff) {})
 
-instance Data.Monoid.Monoid Subscription where
+instance monoidSubscription :: Data.Monoid.Monoid Subscription where
   mempty = Subscription (return {})
   (<>) (Subscription cancel1) (Subscription cancel2) = Subscription (do
     cancel1
@@ -182,7 +182,7 @@ data RArrayChange a
   | Updated a Number
   | Removed Number
 
-instance (Prelude.Show a) => Prelude.Show (RArrayChange a) where
+instance showArrayChange :: (Prelude.Show a) => Prelude.Show (RArrayChange a) where
   show (Inserted a n) = "Inserted " ++ show a ++ " at " ++ show n
   show (Updated a n) = "Updated " ++ show n ++ " to " ++ show a
   show (Removed n) = "Removed at index " ++ show n
@@ -228,7 +228,7 @@ toComputedArray arr = Computed
   , subscribe: \f -> subscribeArray arr (\_ -> readRArray arr >>= f)
   }
 
-instance Prelude.Monad Computed where
+instance monadComputed :: Prelude.Monad Computed where
   return = pure
   (>>=) (Computed a) f = Computed 
     { read: do
@@ -252,7 +252,7 @@ instance Prelude.Monad Computed where
           unsubscribe)
     }
 
-instance Prelude.Applicative Computed where
+instance applicativeComputed :: Prelude.Applicative Computed where
   pure a = Computed 
     { read: pure a
     , subscribe: \_ -> pure mempty
