@@ -1,13 +1,13 @@
 all: lib test
 
 lib:
-	mkdir -p js/Data/
-	psc src/Data/Reactive.purs.hs \
-	  -o js/Data/Reactive.js \
-	  -e js/Data/Reactive.e.purs.hs \
-	  --module Data.Reactive --tco --magic-do
+	mkdir -p js/Control/
+	psc src/Control/Reactive.purs.hs \
+	  -o js/Control/Reactive.js \
+	  -e js/Control/Reactive.e.purs.hs \
+	  --module Control.Reactive --tco --magic-do
 
 test:
-	psc src/Data/Reactive.purs.hs examples/test.purs.hs \
+	psc src/Control/Reactive.purs.hs examples/test.purs.hs \
 	  -o js/test.js \
 	  --main --module Main --tco --magic-do

@@ -2,7 +2,7 @@ module Main where
 
 import Prelude
 import Control.Monad.Eff
-import Data.Reactive
+import Control.Reactive
 
 main = do
   r1 <- newRVar 1

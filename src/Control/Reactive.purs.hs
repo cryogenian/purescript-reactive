@@ -1,4 +1,4 @@
-module Data.Reactive where
+module Control.Reactive where
 
 import Prelude
 import Control.Monad.Eff
