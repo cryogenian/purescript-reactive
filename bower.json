@@ -1,0 +1,20 @@
+{
+  "name": "purescript-reactive",
+  "version": "0.0.0",
+  "homepage": "https://github.com/purescript/purescript-reactive",
+  "authors": [
+    "Phil Freeman <paf31@cantab.net>"
+  ],
+  "description": "Reactive variables",
+  "keywords": [
+    "purescript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "externs",
+    "js"
+  ]
+}
