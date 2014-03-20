@@ -3,7 +3,8 @@ module Control.Reactive where
 import Prelude
 import Control.Monad.Eff
 import Data.Monoid
-import Data.IORef (newIORef, readIORef, writeIORef, unsafeRunIORef)
+import Control.Monad.Eff.Ref (newRef, readRef, writeRef)
+import Control.Monad.Eff.Ref.Unsafe (unsafeRunRef)
 
 -- Reactive variables
 foreign import data RVar :: * -> *
@@ -239,16 +240,16 @@ instance monadComputed :: Prelude.Monad Computed where
         initial <- a.read 
         let Computed b = f initial
         s <- b.subscribe ob
-        r <- unsafeRunIORef $ newIORef s
+        r <- unsafeRunRef $ newRef s
         aSub <- a.subscribe $ \a' -> do
-          Subscription unsubscribe <- unsafeRunIORef $ readIORef r
+          Subscription unsubscribe <- unsafeRunRef $ readRef r
           unsubscribe
           let Computed b' = f a'
           b'.read >>= ob
           s' <- b'.subscribe ob
-          unsafeRunIORef $ writeIORef r s'
+          unsafeRunRef $ writeRef r s'
         return $ aSub <> Subscription (do
-          Subscription unsubscribe <- unsafeRunIORef $ readIORef r
+          Subscription unsubscribe <- unsafeRunRef $ readRef r
           unsubscribe)
     }
 
