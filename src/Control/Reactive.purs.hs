@@ -234,23 +234,25 @@ instance monadComputed :: Prelude.Monad Computed where
   (>>=) (Computed a) f = Computed 
     { read: do
         x <- a.read
-        let Computed y = f x
-        y.read
+        case f x of
+          Computed y -> y.read
     , subscribe: \ob -> do
         initial <- a.read 
-        let Computed b = f initial
-        s <- b.subscribe ob
-        r <- unsafeRunRef $ newRef s
-        aSub <- a.subscribe $ \a' -> do
-          Subscription unsubscribe <- unsafeRunRef $ readRef r
-          unsubscribe
-          let Computed b' = f a'
-          b'.read >>= ob
-          s' <- b'.subscribe ob
-          unsafeRunRef $ writeRef r s'
-        return $ aSub <> Subscription (do
-          Subscription unsubscribe <- unsafeRunRef $ readRef r
-          unsubscribe)
+        case f initial of 
+          Computed b -> do
+            s <- b.subscribe ob
+            r <- unsafeRunRef $ newRef s
+            aSub <- a.subscribe $ \a' -> do
+              Subscription unsubscribe <- unsafeRunRef $ readRef r
+              unsubscribe
+              case f a' of
+                Computed b' -> do
+                  b'.read >>= ob
+                  s' <- b'.subscribe ob
+                  unsafeRunRef $ writeRef r s'
+            return $ aSub <> Subscription (do
+              Subscription unsubscribe <- unsafeRunRef $ readRef r
+              unsubscribe)
     }
 
 instance applicativeComputed :: Prelude.Applicative Computed where
