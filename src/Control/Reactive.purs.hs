@@ -275,6 +275,8 @@ instance applicativeComputed :: Prelude.Applicative Computed where
         return $ s1 <> s2
     }
 
+instance functorComputed :: Functor Computed where
+  (<$>) = liftA1
 
 -- Read a computed value
 readComputed :: forall a eff. Computed a -> Eff (reactive :: Reactive | eff) a
