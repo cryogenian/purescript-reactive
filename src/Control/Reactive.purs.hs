@@ -160,11 +160,13 @@ foreign import updateRArray
 -- Subscription which can be cancelled
 data Subscription = Subscription (forall eff. Eff (reactive :: Reactive | eff) {})
 
-instance monoidSubscription :: Data.Monoid.Monoid Subscription where
-  mempty = Subscription (return {})
+instance semigroupSubscription :: Semigroup Subscription where
   (<>) (Subscription cancel1) (Subscription cancel2) = Subscription (do
     cancel1
     cancel2)
+
+instance monoidSubscription :: Data.Monoid.Monoid Subscription where
+  mempty = Subscription (return {})
 
 -- Subscribe for updates on an RVar 
 foreign import subscribe 
@@ -229,8 +231,7 @@ toComputedArray arr = Computed
   , subscribe: \f -> subscribeArray arr (\_ -> readRArray arr >>= f)
   }
 
-instance monadComputed :: Prelude.Monad Computed where
-  return = pure
+instance bindComputed :: Prelude.Bind Computed where
   (>>=) (Computed a) f = Computed 
     { read: do
         x <- a.read
@@ -260,6 +261,8 @@ instance applicativeComputed :: Prelude.Applicative Computed where
     { read: pure a
     , subscribe: \_ -> pure mempty
     }
+
+instance applyComputed :: Apply Computed where
   (<*>) (Computed f) (Computed x) = Computed
     { read: do
         f' <- f.read
@@ -277,6 +280,8 @@ instance applicativeComputed :: Prelude.Applicative Computed where
 
 instance functorComputed :: Functor Computed where
   (<$>) = liftA1
+
+instance monadComputed :: Monad Computed
 
 -- Read a computed value
 readComputed :: forall a eff. Computed a -> Eff (reactive :: Reactive | eff) a
