@@ -26,7 +26,7 @@ foreign import newRVar
   \        self.listeners = [];\
   \        self.subscribe = function (listener) {\
   \          this.listeners.push(listener);\
-  \          return module.Subscription(function() {\
+  \          return Subscription(function() {\
   \            for (var i = 0; i < self.listeners.length; i++) {\
   \              if (self.listeners[i] === listener) {\
   \                self.listeners.splice(i, 1);\
@@ -57,7 +57,7 @@ foreign import newRArray
   \        self.listeners = [];\
   \        self.subscribe = function (listener) {\
   \          this.listeners.push(listener);\
-  \          return module.Subscription(function() {\
+  \          return Subscription(function() {\
   \            for (var i = 0; i < self.listeners.length; i++) {\
   \              if (self.listeners[i] === listener) {\
   \                self.listeners.splice(i, 1);\
@@ -69,19 +69,19 @@ foreign import newRArray
   \        self.insert = function (value, index) {\
   \          self.values.splice(index, 0, value);\
   \          for (var i = 0; i < self.listeners.length; i++) {\
-  \            self.listeners[i](module.Inserted(value)(index));\
+  \            self.listeners[i](Inserted(value)(index));\
   \          }\
   \        };\
   \        self.remove = function (index) {\
   \          self.values.splice(index, 1);\
   \          for (var i = 0; i < self.listeners.length; i++) {\
-  \            self.listeners[i](module.Removed(index));\
+  \            self.listeners[i](Removed(index));\
   \          }\
   \        };\
   \        self.update = function (value, index) {\
   \          self.values[index] = index;\
   \          for (var i = 0; i < self.listeners.length; i++) {\
-  \            self.listeners[i](module.Updated(value)(index));\
+  \            self.listeners[i](Updated(value)(index));\
   \          }\
   \        };\
   \      };\
