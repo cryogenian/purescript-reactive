@@ -113,7 +113,7 @@ foreign import writeRVar
   \      ref.update(value);\
   \    };\
   \  };\
-  \}" :: forall a eff. RVar a -> a -> Eff (reactive :: Reactive | eff) {}
+  \}" :: forall a eff. RVar a -> a -> Eff (reactive :: Reactive | eff) Unit
 
 -- Get an element at an index in a reactive collection
 foreign import peekRArray 
@@ -133,7 +133,7 @@ foreign import insertRArray
   \      };\
   \    };\
   \  };\
-  \}" :: forall a eff. RArray a -> a -> Number -> Eff (reactive :: Reactive | eff) {}
+  \}" :: forall a eff. RArray a -> a -> Number -> Eff (reactive :: Reactive | eff) Unit
 
 -- Remove a value from a reactive collection
 foreign import removeRArray 
@@ -155,10 +155,10 @@ foreign import updateRArray
   \      };\
   \    };\
   \  };\
-  \}" :: forall a eff. RArray a -> a -> Number -> Eff (reactive :: Reactive | eff) {}
+  \}" :: forall a eff. RArray a -> a -> Number -> Eff (reactive :: Reactive | eff) Unit
 
 -- Subscription which can be cancelled
-data Subscription = Subscription (forall eff. Eff (reactive :: Reactive | eff) {})
+data Subscription = Subscription (forall eff. Eff (reactive :: Reactive | eff) Unit)
 
 instance semigroupSubscription :: Semigroup Subscription where
   (<>) (Subscription cancel1) (Subscription cancel2) = Subscription (do
@@ -166,7 +166,7 @@ instance semigroupSubscription :: Semigroup Subscription where
     cancel2)
 
 instance monoidSubscription :: Data.Monoid.Monoid Subscription where
-  mempty = Subscription (return {})
+  mempty = Subscription (return unit)
 
 -- Subscribe for updates on an RVar 
 foreign import subscribe 
@@ -178,7 +178,7 @@ foreign import subscribe
   \      });\
   \    };\
   \  };\
-  \}" :: forall a eff. RVar a -> (a -> Eff (reactive :: Reactive | eff) {}) -> Eff (reactive :: Reactive | eff) Subscription
+  \}" :: forall a eff. RVar a -> (a -> Eff (reactive :: Reactive | eff) Unit) -> Eff (reactive :: Reactive | eff) Subscription
 
 data RArrayChange a
   = Inserted a Number
@@ -200,11 +200,11 @@ foreign import subscribeArray
   \      });\
   \    };\
   \  };\
-  \}" :: forall a eff. RArray a -> (RArrayChange a -> Eff (reactive :: Reactive | eff) {}) -> Eff (reactive :: Reactive | eff) Subscription
+  \}" :: forall a eff. RArray a -> (RArrayChange a -> Eff (reactive :: Reactive | eff) Unit) -> Eff (reactive :: Reactive | eff) Subscription
 
 ------------------------------------------------------------------------------------------------
 
-modifyRVar :: forall a eff. RVar a -> (a -> a) -> Eff (reactive :: Reactive | eff) {}
+modifyRVar :: forall a eff. RVar a -> (a -> a) -> Eff (reactive :: Reactive | eff) Unit
 modifyRVar v f = do
   a <- readRVar v
   writeRVar v $ f a
@@ -214,7 +214,7 @@ modifyRVar v f = do
 -- Type of computed (read-only) values
 data Computed a = Computed 
   { read :: forall eff. Eff (reactive :: Reactive | eff) a
-  , subscribe :: forall eff. (a -> Eff (reactive :: Reactive | eff) {}) -> Eff (reactive :: Reactive | eff) Subscription
+  , subscribe :: forall eff. (a -> Eff (reactive :: Reactive | eff) Unit) -> Eff (reactive :: Reactive | eff) Subscription
   }
 
 -- Convert an RVar to a computed value
@@ -288,7 +288,7 @@ readComputed :: forall a eff. Computed a -> Eff (reactive :: Reactive | eff) a
 readComputed (Computed c) = c.read
 
 -- Subscribe for updates on a computed value
-subscribeComputed :: forall a eff. Computed a -> (a -> Eff (reactive :: Reactive | eff) {}) -> Eff (reactive :: Reactive | eff) Subscription
+subscribeComputed :: forall a eff. Computed a -> (a -> Eff (reactive :: Reactive | eff) Unit) -> Eff (reactive :: Reactive | eff) Subscription
 subscribeComputed (Computed c) f = c.subscribe f
 
 ------------------------------------------------------------------------------------------------
