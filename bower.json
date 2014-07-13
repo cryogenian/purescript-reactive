@@ -1,6 +1,6 @@
 {
   "name": "purescript-reactive",
-  "homepage": "https://github.com/purescript/purescript-reactive",
+  "homepage": "https://github.com/purescript-contrib/purescript-reactive",
   "authors": [
     "Phil Freeman <paf31@cantab.net>"
   ],
