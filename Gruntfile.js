@@ -44,5 +44,6 @@ module.exports = function(grunt) {
   
   grunt.registerTask("exampleTest", ["psc:exampleTest", "execute:exampleTest"]);
   grunt.registerTask("make", ["pscMake", "dotPsci", "docgen"]);
+  grunt.registerTask("test", ["exampleTest"]);
   grunt.registerTask("default", ["make"]);
 };
