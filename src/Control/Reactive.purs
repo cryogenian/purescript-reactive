@@ -26,7 +26,7 @@ foreign import newRVar
   \        self.listeners = [];\
   \        self.subscribe = function (listener) {\
   \          this.listeners.push(listener);\
-  \          return Subscription(function() {\
+  \          return new Subscription(function() {\
   \            for (var i = 0; i < self.listeners.length; i++) {\
   \              if (self.listeners[i] === listener) {\
   \                self.listeners.splice(i, 1);\
